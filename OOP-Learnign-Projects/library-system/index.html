@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management - OOP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">
+            <i class="fas fa-book-reader mr-2"></i>Library Management System
+        </h1>
+        
+        <!-- Admin Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-6">Admin Dashboard</h2>
+            
+            <!-- Admin Tabs -->
+            <div class="border-b border-gray-200 mb-6">
+                <ul class="flex -mb-px" id="adminTabs">
+                    <li class="mr-1">
+                        <button class="tab-btn inline-block py-2 px-4 font-semibold" data-tab="addBooks">
+                            <i class="fas fa-plus-circle mr-2"></i>Add Books
+                        </button>
+                    </li>
+                    <li class="mr-1">
+                        <button class="tab-btn inline-block py-2 px-4 font-semibold" data-tab="availability">
+                            <i class="fas fa-book mr-2"></i>Availability
+                        </button>
+                    </li>
+                    <li class="mr-1">
+                        <button class="tab-btn inline-block py-2 px-4 font-semibold" data-tab="borrowed">
+                            <i class="fas fa-hand-holding mr-2"></i>Borrowed Books
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Add Books Tab -->
+            <div id="addBooks" class="tab-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="bookTitle" placeholder="Book Title" class="w-full p-2 border rounded">
+                    <input type="text" id="bookAuthor" placeholder="Author" class="w-full p-2 border rounded">
+                    <select id="bookType" class="w-full p-2 border rounded">
+                        <option value="physical">Physical Book</option>
+                        <option value="ebook">EBook</option>
+                    </select>
+                    <input type="text" id="bookDetail" placeholder="Shelf Number/File Size" class="w-full p-2 border rounded">
+                </div>
+                <button id="addBookBtn" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+                    Add Book
+                </button>
+            </div>
+
+            <!-- Availability Tab -->
+            <div id="availability" class="tab-content hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="availableBooks" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Borrowed Tab -->
+            <div id="borrowed" class="tab-content hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="borrowedBooks" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold mb-6">User Section</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <input type="text" id="userName" placeholder="Your Name" class="w-full p-2 border rounded">
+                <input type="text" id="userBookTitle" placeholder="Book Title" class="w-full p-2 border rounded">
+            </div>
+            <div class="flex gap-4">
+                <button id="borrowBtn" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition">
+                    <i class="fas fa-hand-holding mr-2"></i>Borrow Book
+                </button>
+                <button id="returnBtn" class="bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition">
+                    <i class="fas fa-undo mr-2"></i>Return Book
+                </button>
+            </div>
+            <div id="userMessage" class="mt-4 p-4 rounded hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        class Book {
+            constructor(title, author) {
+                this.title = title;
+                this.author = author;
+                this.available = true;
+                this.borrower = null;
+            }
+
+            getDetails() {
+                return `${this.title} by ${this.author}`;
+            }
+        }
+
+        class PhysicalBook extends Book {
+            constructor(title, author, shelfNumber) {
+                super(title, author);
+                this.shelfNumber = shelfNumber;
+                this.type = 'physical';
+            }
+        }
+
+        class EBook extends Book {
+            constructor(title, author, fileSize) {
+                super(title, author);
+                this.fileSize = fileSize;
+                this.type = 'ebook';
+            }
+        }
+
+        class Library {
+            constructor() {
+                this.books = [];
+                this.initialize();
+            }
+
+            initialize() {
+                // Tab functionality
+                document.querySelectorAll('.tab-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        this.switchTab(e.target.dataset.tab);
+                    });
+                });
+
+                // Set initial active tab
+                this.switchTab('addBooks');
+
+                // Add event listeners
+                document.getElementById('addBookBtn').addEventListener('click', () => this.addBook());
+                document.getElementById('borrowBtn').addEventListener('click', () => this.borrowBook());
+                document.getElementById('returnBtn').addEventListener('click', () => this.returnBook());
+            }
+
+            switchTab(tabId) {
+                // Update tab buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    if (btn.dataset.tab === tabId) {
+                        btn.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                    } else {
+                        btn.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                    }
+                });
+
+                // Show/hide tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(tabId).classList.remove('hidden');
+            }
+
+            showUserMessage(message, isError = false) {
+                const messageDiv = document.getElementById('userMessage');
+                messageDiv.textContent = message;
+                messageDiv.className = `mt-4 p-4 rounded ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+            }
+
+            addBook() {
+                const title = document.getElementById('bookTitle').value;
+                const author = document.getElementById('bookAuthor').value;
+                const type = document.getElementById('bookType').value;
+                const detail = document.getElementById('bookDetail').value;
+
+                if (!title || !author || !detail) {
+                    this.showUserMessage('Please fill all fields', true);
+                    return;
+                }
+
+                const book = type === 'physical' 
+                    ? new PhysicalBook(title, author, detail)
+                    : new EBook(title, author, detail);
+
+                this.books.push(book);
+                this.updateDisplay();
+                this.clearInputs();
+                this.showUserMessage('Book added successfully');
+            }
+
+            borrowBook() {
+                const userName = document.getElementById('userName').value;
+                const title = document.getElementById('userBookTitle').value;
+
+                if (!userName || !title) {
+                    this.showUserMessage('Please enter your name and book title', true);
+                    return;
+                }
+
+                const book = this.books.find(b => b.title === title && b.available);
+                if (book) {
+                    book.available = false;
+                    book.borrower = userName;
+                    this.updateDisplay();
+                    this.showUserMessage(`Successfully borrowed: ${book.getDetails()}`);
+                } else {
+                    this.showUserMessage(`Sorry, "${title}" is currently not available`, true);
+                }
+            }
+
+            returnBook() {
+                const title = document.getElementById('userBookTitle').value;
+                const book = this.books.find(b => b.title === title && !b.available);
+                
+                if (book) {
+                    book.available = true;
+                    book.borrower = null;
+                    this.updateDisplay();
+                    this.showUserMessage(`Successfully returned: ${book.getDetails()}`);
+                } else {
+                    this.showUserMessage('Book not found or already returned', true);
+                }
+            }
+
+            clearInputs() {
+                ['bookTitle', 'bookAuthor', 'bookDetail'].forEach(id => {
+                    document.getElementById(id).value = '';
+                });
+            }
+
+            updateDisplay() {
+                const availableContainer = document.getElementById('availableBooks');
+                const borrowedContainer = document.getElementById('borrowedBooks');
+                
+                availableContainer.innerHTML = '';
+                borrowedContainer.innerHTML = '';
+
+                this.books.forEach(book => {
+                    const row = document.createElement('tr');
+                    
+                    if (book.available) {
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">${book.title}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${book.author}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${book.type}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                ${book.type === 'physical' ? `Shelf: ${book.shelfNumber}` : `Size: ${book.fileSize}`}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Available
+                                </span>
+                            </td>
+                        `;
+                        availableContainer.appendChild(row);
+                    } else {
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">${book.title}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${book.author}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${book.borrower}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${book.type}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                ${book.type === 'physical' ? `Shelf: ${book.shelfNumber}` : `Size: ${book.fileSize}`}
+                            </td>
+                        `;
+                        borrowedContainer.appendChild(row);
+                    }
+                });
+            }
+        }
+
+        // Initialize the library
+        const library = new Library();
+    </script>
+</body>
+</html>
